@@ -48,23 +48,24 @@ Validator.prototype = {
         throw 'Validator `' + this.name + '` does not handle multiple values';
       return this.validateMultiple(...arguments);
     } else {
-      let instance = arguments[arguments.length - 1];
+      const args = [...arguments];
+      let instance = args[args.length - 1];
       if (this.validateDate && instance._isDateInput()) {
-        arguments[0] = Utils.parse.date(arguments[0]);
-        if (arguments[0] === null)
+        args[0] = Utils.parse.date(args[0]);
+        if (args[0] === null)
           return false;
-        return this.validateDate(...arguments);
+        return this.validateDate(...args);
       }
       if (this.validateNumber) {
         if (!value) // Builtin validators all accept empty strings, except `required` of course
           return true;
         if (isNaN(value))
           return false;
-        arguments[0] = parseFloat(arguments[0]);
-        return this.validateNumber(...arguments);
+        args[0] = parseFloat(args[0]);
+        return this.validateNumber(...args);
       }
       if (this.validateString) {
-        return this.validateString(...arguments);
+        return this.validateString(...args);
       }
       throw 'Validator `' + this.name + '` only handles multiple values';
     }
