@@ -1,0 +1,25 @@
+---
+version: "3"
+
+services:
+    parsley-js:
+        container_name: parsley-js
+        image: parsley/node-gulp:build
+        ports:
+            - "5000:5000"  # Port for Parsley build.
+        environment:
+            - NODE_ENV:Development
+        volumes:
+            - ./src:/parsley/src/  # source volume
+            - ./dist:/parsley/dist/  # dist volume
+            - ./doc:/parsley/doc/  # doc volume
+            - ./test:/parsley/test/  # test volume
+            - ./tools:/parsley/tools/  # test volume
+            - ./package.json:/parsley/package.json #package file
+            - ./.babelrc:/parsley/.babelrc #babelrc file
+            - ./.eslintrc:/parsley/.eslintrc #eslintrc file
+            - ./index.html:/parsley/index.html
+            - ./README.md:/parsley/README.md
+            - ./gulpfile.babel.js:/parsley/gulpfile.babel.js #gulp file
+            - ./rollup.config.js:/parsley/rollup.config.js #rollup file
+        command: sh -c "ls -l && npm install --skip-installed && gulp build"

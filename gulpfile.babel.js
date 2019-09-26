@@ -23,7 +23,7 @@ const exportFileName = path.basename(mainFile, path.extname(mainFile));
 
 // Remove a directory
 function clean(dir, done) {
-  del([dir], done);
+  return del([dir + '**/*.*'], done);
 }
 
 // Lint a set of files
@@ -116,14 +116,14 @@ function gitTag() {
   $.git.tag(manifest.version, '', {quiet: false}, err => { if (err) throw err });
 }
 
-gulp.task('release-git-clean', gitClean);
-gulp.task('release-npm-publish', npmPublish);
-gulp.task('release-git-push', gitPush);
-gulp.task('release-git-push-pages', gitPushPages);
-gulp.task('release-git-tag', gitTag);
+gulp.task('release-git-clean', gulp.series(gitClean));
+gulp.task('release-npm-publish', gulp.series(npmPublish));
+gulp.task('release-git-push', gulp.series(gitPush));
+gulp.task('release-git-push-pages', gulp.series(gitPushPages));
+gulp.task('release-git-tag', gulp.series(gitTag));
 
 gulp.task('release', () => {
-  runSequence('release-git-clean', 'release-git-tag', 'release-git-push', 'release-git-push-pages', 'release-npm-publish');
+  gulp.series('release-git-clean', 'release-git-tag', 'release-git-push', 'release-git-push-pages', 'release-npm-publish');
 });
 // Remove the built files
 gulp.task('clean', (done) => clean(destinationFolder, done));
@@ -137,27 +137,28 @@ gulp.task('lint-src', () => lint('src/**/*.js'));
 // Lint our test code
 gulp.task('lint-test', () => lint('test/**/*.js'));
 
-// Build two versions of the library
-gulp.task('build-src', ['lint-src', 'clean', 'build-i18n'], () => build(...defaultRollupOptions));
-
 // Build the i18n translations
-gulp.task('build-i18n', ['clean'], copyI18n);
+gulp.task('build-i18n', gulp.series('clean', copyI18n));
+
+// Build two versions of the library
+gulp.task('build-src', gulp.series('lint-src', 'clean', 'build-i18n', () => build(...defaultRollupOptions)));
+
 
 // Build the annotated documentation
-gulp.task('build-doc', buildDoc);
+gulp.task('build-doc', gulp.series(buildDoc));
 
 // Build the annotated documentation
-gulp.task('build-doc-test', buildDocTest);
+gulp.task('build-doc-test', gulp.series(buildDocTest));
 
 gulp.task('write-version', writeVersion);
 
-gulp.task('build', ['build-src', 'build-i18n', 'build-doc', 'build-doc-test', 'write-version']);
+gulp.task('build', gulp.series('build-src', 'build-i18n', 'build-doc', 'build-doc-test', 'write-version'));
 
 // Lint and run our tests
-gulp.task('test', ['lint-src', 'lint-test'], test);
+gulp.task('test', gulp.series('lint-src', 'lint-test', test));
 
 // Build for our spec runner `test/runner.html`
-gulp.task('test-browser', testBrowser);
+gulp.task('test-browser', gulp.series(testBrowser));
 
 // An alias of test
-gulp.task('default', ['test']);
+gulp.task('default', gulp.series('test'));

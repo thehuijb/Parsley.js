@@ -18,9 +18,9 @@
   "devDependencies": {
     "expect.js": "*",
     "mocha": "*",
-    "bootstrap": "~3.0.3",
-    "sinonjs": "~1.7.3",
-    "uwidget": "~0.0.1"
+    "bootstrap": "latest",
+    "sinonjs": "latest",
+    "uwidget": "latest"
   },
   "keywords": [
     "parsley",
