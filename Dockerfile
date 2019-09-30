@@ -1,6 +1,6 @@
 FROM mhart/alpine-node:10
 
-LABEL maintainer="cznl"
+LABEL maintainer="Parsley.js"
 
 ENV NODE_ENV development
 ENV PARSLEY_HOME /parsley
